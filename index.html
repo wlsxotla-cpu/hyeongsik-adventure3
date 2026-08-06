@@ -325,13 +325,6 @@
     transform:rotate(-8deg);
     background:rgba(240,198,116,.1);
   }
-  .offline-btn{
-    width:100%; padding:14px; margin-bottom:10px; border-radius:14px; border:none;
-    background:linear-gradient(135deg, var(--brass), var(--brass-light)); color:#1a1233;
-    font-weight:800; font-size:14px; cursor:pointer; font-family:inherit;
-    box-shadow:0 6px 16px rgba(240,198,116,.4);
-  }
-  .offline-btn:active{ transform:scale(.98); }
   .deed h2{ margin:0 0 10px; font-size:23px; color:var(--ink-900); }
   .deed p{ font-size:13px; color:var(--text-sub); line-height:1.6; margin:0 0 6px; }
   .deed button{
@@ -465,7 +458,6 @@
 
   <div class="ledger">
     <div class="ledger-head diary-font">💪 오늘도 출근</div>
-    <button class="offline-btn" id="offlineBtn" style="display:none;"></button>
     <button class="stamp-btn" id="workBtn">
       <span class="auto-badge" id="autoBadge">자동 출근중</span>
       <span class="stamp-btn-label">출근해서 일하기</span>
@@ -642,8 +634,7 @@
     },
     autoClick:false,
     modalOpen:false,
-    lottoCooldownUntil:0,
-    lastActiveAt:null
+    lottoCooldownUntil:0
   };
 
   Object.values(state.upgrades).forEach(u => u.cost = u.baseCost);
@@ -1389,7 +1380,6 @@
   });
 
   setInterval(()=>{
-    state.lastActiveAt = Date.now();
     const rentRate = realtyRentRate();
     const rate = currentCps() + rentRate;
     if(rate > 0){
@@ -1445,52 +1435,6 @@
     if(document.visibilityState === "hidden") save();
   });
 
-  const OFFLINE_CAP_SEC = 8 * 3600;
-  let pendingOffline = null;
-
-  function offlineTimeText(elapsedSec){
-    const hrs = Math.floor(elapsedSec / 3600), mins = Math.floor((elapsedSec % 3600) / 60);
-    return hrs > 0 ? `${hrs}시간 ${mins}분` : `${mins}분`;
-  }
-
-  function updateOfflineButton(){
-    const btn = document.getElementById("offlineBtn");
-    if(pendingOffline){
-      btn.textContent = `💤 오프라인 수입 받기 (${offlineTimeText(pendingOffline.elapsedSec)} · +${fmt(pendingOffline.income)})`;
-      btn.style.display = "block";
-    } else {
-      btn.style.display = "none";
-    }
-  }
-
-  function applyOfflineEarnings(){
-    const now = Date.now();
-    const last = state.lastActiveAt || now;
-    let elapsedSec = Math.floor((now - last) / 1000);
-    state.lastActiveAt = now;
-    if(elapsedSec < 30) return;
-    elapsedSec = Math.min(elapsedSec, OFFLINE_CAP_SEC);
-    const rentPortion = realtyRentRate() * elapsedSec;
-    const income = currentCps() * elapsedSec + rentPortion;
-    if(income > 0){
-      pendingOffline = { income, elapsedSec, rentPortion };
-      updateOfflineButton();
-    }
-  }
-
-  document.getElementById("offlineBtn").addEventListener("click", ()=>{
-    if(!pendingOffline) return;
-    addMoney(pendingOffline.income);
-    if(pendingOffline.rentPortion > 0){
-      state.markets.realty.totalRentEarned = (state.markets.realty.totalRentEarned || 0) + pendingOffline.rentPortion;
-      state.stats.investProfitLifetime += pendingOffline.rentPortion;
-    }
-    log(`오프라인 수입 (${offlineTimeText(pendingOffline.elapsedSec)}) +${fmt(pendingOffline.income)}`, "gain");
-    showToast(`💤 오프라인 수입 +${fmt(pendingOffline.income)}`, "gain");
-    pendingOffline = null;
-    updateOfflineButton();
-    render();
-  });
 
   function hardRefresh(){
     const btn = document.getElementById("refreshBtn");
@@ -1528,7 +1472,6 @@
     if(!m.historyFlags || m.historyFlags.length !== m.history.length) m.historyFlags = m.history.map(()=>false);
   });
   state.modalOpen = false;
-  applyOfflineEarnings();
   render();
   MARKET_KEYS.forEach(key=>{
     setupMarketChartHover(key);
