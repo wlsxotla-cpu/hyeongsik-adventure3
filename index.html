@@ -560,6 +560,7 @@
     <div class="stock-hold" id="statTotalEarned">누적 수입 0원</div>
     <div class="stock-hold" id="statInvestProfit">투자 누적 수익 0원</div>
     <div class="stock-hold" id="statMultBonus">현재 배율 보너스 +0%</div>
+    <div class="stock-hold" id="statBestFinalAge">잠실 완주 최연소 기록 없음</div>
   </div>
 
   <div class="ledger">
@@ -623,7 +624,7 @@
     startedAt: Date.now(),
     startAge: 32,
     prestige: { count:0 },
-    stats: { totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0 },
+    stats: { totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null },
     everReachedFinal: false,
     stageIndex: 0,
     currentHome: "서울 강동구 빌라 거주 · 기혼",
@@ -879,6 +880,9 @@
     document.getElementById("statInvestProfit").textContent = "투자 누적 수익 " + fmt(state.stats.investProfitLifetime);
     const bonusPct = Math.round((currentPrestigeMult() * currentInvestMult() - 1) * 100);
     document.getElementById("statMultBonus").textContent = "현재 배율 보너스 +" + bonusPct + "%";
+    document.getElementById("statBestFinalAge").textContent = state.stats.bestFinalAge != null
+      ? `잠실 완주 최연소 기록 ${state.stats.bestFinalAge}세`
+      : "잠실 완주 최연소 기록 없음";
   }
 
   function renderPrestige(){
@@ -1323,7 +1327,13 @@
       const s = STORY_STAGES[state.stageIndex];
       const isFinal = state.stageIndex === STORY_STAGES.length - 1;
       const finishedIndex = state.stageIndex;
-      if(isFinal) state.everReachedFinal = true;
+      if(isFinal){
+        state.everReachedFinal = true;
+        const ageNow = currentAge();
+        if(state.stats.bestFinalAge == null || ageNow < state.stats.bestFinalAge){
+          state.stats.bestFinalAge = ageNow;
+        }
+      }
       state.currentHome = s.sub;
       log(s.moveMsg, "gain");
       showToast(s.moveMsg, "move");
@@ -1410,7 +1420,7 @@
       });
       state.family = Object.assign({kids:0}, state.family || {});
       state.prestige = Object.assign({count:0}, state.prestige || {});
-      state.stats = Object.assign({totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0}, state.stats || {});
+      state.stats = Object.assign({totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null}, state.stats || {});
       state.everReachedFinal = !!state.everReachedFinal;
     }catch(e){}
   }
