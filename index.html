@@ -600,7 +600,7 @@
 
   const SAVE_KEY = "hyeongsik_adventure_childrearing_v1";
   const MARKET_HISTORY_MAX = 40;
-  const AGE_MS_PER_YEAR = 20 * 60 * 1000; // 현실 20분 = 게임 속 1년
+  const AGE_MS_PER_YEAR = 30 * 1000; // 현실 30초 = 게임 속 1년. 40~80세로 클램프되어 평균 플레이는 50~60대, 잘하면 40대, 못하면 80대에 완주하도록 설계
 
   const state = {
     money: 0,
@@ -748,13 +748,21 @@
     return state.family.kids > 0 ? " · 슬하 " + state.family.kids + "명" : "";
   }
 
+  const MAX_LIVE_AGE = 80;
+  const MIN_FINAL_AGE = 40;
+
   function ageDetail(){
     const elapsedMs = Date.now() - state.startedAt;
     const totalMonths = Math.floor(elapsedMs / (AGE_MS_PER_YEAR / 12));
-    return { years: state.startAge + Math.floor(totalMonths / 12), months: totalMonths % 12 };
+    const rawYears = state.startAge + Math.floor(totalMonths / 12);
+    if(rawYears >= MAX_LIVE_AGE) return { years: MAX_LIVE_AGE, months: 0 };
+    return { years: rawYears, months: totalMonths % 12 };
   }
   function currentAge(){
     return ageDetail().years;
+  }
+  function finalAchievementAge(){
+    return Math.max(MIN_FINAL_AGE, currentAge());
   }
   function updateAgeDisplay(){
     const el = document.getElementById("holderName");
@@ -772,7 +780,13 @@
   }
 
   function currentPrestigeMult(){ return 1 + state.prestige.count * 0.15; }
-  function currentInvestMult(){ return 1 + Math.floor(state.stats.investProfitLifetime / 50000000) * 0.02; }
+  function currentInvestMult(){
+    // 초반 소액 이익엔 기존과 비슷하게 반응하지만, 누적 수익이 커질수록 증가폭이
+    // 점점 완만해지고(제곱근) +75%에서 상한 — 한 번의 대박 스노우볼이 게임을
+    // 통째로 무너뜨리지 않도록 함
+    const bonus = Math.sqrt(Math.max(0, state.stats.investProfitLifetime)) / 100000;
+    return 1 + Math.min(0.75, bonus);
+  }
   function currentClickValue(){ return state.clickBase * state.clickMult * currentPrestigeMult() * currentInvestMult(); }
   function currentCps(){ return state.cps * state.clickMult * currentPrestigeMult() * currentInvestMult(); }
   function realtyRentRate(){
@@ -1329,7 +1343,7 @@
       const finishedIndex = state.stageIndex;
       if(isFinal){
         state.everReachedFinal = true;
-        const ageNow = currentAge();
+        const ageNow = finalAchievementAge();
         if(state.stats.bestFinalAge == null || ageNow < state.stats.bestFinalAge){
           state.stats.bestFinalAge = ageNow;
         }
@@ -1344,7 +1358,7 @@
           ? `형식이는 마침내 <b>${s.home}</b>의 주인이 되었습니다.`
           : `이제 <b>${s.home}</b>에 삽니다.`,
         desc2: isFinal
-          ? `강동구 빌라에서 시작해 노원, 동대문, 수지를 거쳐 잠실까지 — 형식이의 내 집 마련 대장정이 여기서 마무리됩니다. 형식이는 <b>만 ${currentAge()}세</b>에 잠실 40평대 아파트의 주인이 되었습니다. 축하합니다.`
+          ? `강동구 빌라에서 시작해 노원, 동대문, 수지를 거쳐 잠실까지 — 형식이의 내 집 마련 대장정이 여기서 마무리됩니다. 형식이는 <b>만 ${finalAchievementAge()}세</b>에 잠실 40평대 아파트의 주인이 되었습니다. 축하합니다.`
           : "다음 목표를 향해 계속 나아가볼까요?",
         btnText: isFinal ? "계속 플레이하기 (더 큰 집으로)" : "계속하기"
       });
