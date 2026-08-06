@@ -9,46 +9,46 @@
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <style>
   :root{
-    color-scheme: light dark;
-    --ink-900:#5a4632;
-    --ink-700:#7a5c3e;
-    --ink-600:#a4805a;
-    --paper:#fffaf1;
-    --paper-line:#f0d9bd;
-    --paper-shadow:#fbeed7;
-    --brass:#ff8f6b;
-    --brass-light:#ffb199;
-    --mint:#3fa980;
-    --mint-light:#7fd8b8;
-    --ink-red:#ef6461;
-    --ink-green:#3fa980;
-    --lavender:#c9b6e4;
+    color-scheme: dark;
+    --ink-900:#f3efff;
+    --ink-700:#d8cdf7;
+    --ink-600:#b3a3e8;
+    --paper:#241a45;
+    --paper-line:#463a75;
+    --paper-shadow:#2e2158;
+    --brass:#f0c674;
+    --brass-light:#ffe4a3;
+    --mint:#4ade80;
+    --mint-light:#8ff0b4;
+    --ink-red:#f87171;
+    --ink-green:#4ade80;
+    --lavender:#b8a6e0;
     --yellow:#ffd873;
-    --backdrop:#fdf1e2;
-    --backdrop-2:#f8e2c5;
-    --text-on-paper:#4a3728;
-    --text-sub:#a8886a;
-    --shadow: 0 20px 46px rgba(200,140,90,.24), 0 4px 12px rgba(200,140,90,.16);
+    --backdrop:#150f2e;
+    --backdrop-2:#0c0820;
+    --text-on-paper:#ece6ff;
+    --text-sub:#9d93c2;
+    --shadow: 0 20px 50px rgba(0,0,0,.55), 0 0 40px rgba(240,198,116,.08);
   }
   :root[data-theme="dark"]{
-    --backdrop:#fdf1e2;
-    --backdrop-2:#f8e2c5;
-    --paper:#fffaf1;
-    --paper-line:#f0d9bd;
-    --paper-shadow:#fbeed7;
-    --text-on-paper:#4a3728;
-    --text-sub:#a8886a;
-    --shadow: 0 20px 46px rgba(200,140,90,.24), 0 4px 12px rgba(200,140,90,.16);
+    --backdrop:#150f2e;
+    --backdrop-2:#0c0820;
+    --paper:#241a45;
+    --paper-line:#463a75;
+    --paper-shadow:#2e2158;
+    --text-on-paper:#ece6ff;
+    --text-sub:#9d93c2;
+    --shadow: 0 20px 50px rgba(0,0,0,.55), 0 0 40px rgba(240,198,116,.08);
   }
   :root[data-theme="light"]{
-    --backdrop:#fdf1e2;
-    --backdrop-2:#f8e2c5;
-    --paper:#fffaf1;
-    --paper-line:#f0d9bd;
-    --paper-shadow:#fbeed7;
-    --text-on-paper:#4a3728;
-    --text-sub:#a8886a;
-    --shadow: 0 20px 46px rgba(200,140,90,.24), 0 4px 12px rgba(200,140,90,.16);
+    --backdrop:#150f2e;
+    --backdrop-2:#0c0820;
+    --paper:#241a45;
+    --paper-line:#463a75;
+    --paper-shadow:#2e2158;
+    --text-on-paper:#ece6ff;
+    --text-sub:#9d93c2;
+    --shadow: 0 20px 50px rgba(0,0,0,.55), 0 0 40px rgba(240,198,116,.08);
   }
 
   *{ box-sizing:border-box; }
@@ -57,8 +57,16 @@
     font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
     background:
       radial-gradient(ellipse at 30% -10%, var(--backdrop-2), transparent 60%),
-      repeating-linear-gradient(135deg, rgba(255,255,255,.4) 0 2px, transparent 2px 34px),
+      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.9), transparent),
+      radial-gradient(1px 1px at 70% 15%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1.5px 1.5px at 40% 65%, rgba(240,198,116,.9), transparent),
+      radial-gradient(1px 1px at 85% 55%, rgba(255,255,255,.6), transparent),
+      radial-gradient(1px 1px at 10% 80%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1.5px 1.5px at 60% 85%, rgba(240,198,116,.7), transparent),
+      radial-gradient(1px 1px at 92% 90%, rgba(255,255,255,.8), transparent),
       var(--backdrop);
+    background-repeat: no-repeat, repeat, repeat, repeat, repeat, repeat, repeat, repeat, no-repeat;
+    background-size: auto, 260px 260px, 260px 260px, 260px 260px, 260px 260px, 260px 260px, 260px 260px, 260px 260px, auto;
     color:var(--text-on-paper);
     min-height:100vh;
     display:flex;
@@ -80,60 +88,61 @@
     position:relative;
   }
 
-  /* ---- Cover (diary front page) ---- */
+  /* ---- Cover (night sky / rebirth) ---- */
   .cover{
     position:relative;
     overflow:hidden;
     border-radius:26px 26px 0 0;
     background:
-      repeating-linear-gradient(135deg, rgba(255,255,255,.09) 0 3px, transparent 3px 9px),
-      linear-gradient(160deg, var(--brass-light), var(--brass) 75%);
-    color:#4a2c1e;
+      radial-gradient(ellipse at 75% -10%, rgba(240,198,116,.28), transparent 55%),
+      linear-gradient(160deg, #2c2158, #130d28 78%);
+    color:#f3efff;
     padding:34px 26px 26px;
   }
   .washi-tape{
-    position:absolute; top:-12px; left:28px; width:96px; height:30px;
-    background:repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 7px, rgba(255,216,153,.75) 7px 14px);
-    transform:rotate(-7deg);
-    box-shadow:0 3px 6px rgba(0,0,0,.12);
-    border-radius:2px;
-    opacity:.92;
+    position:absolute; top:14px; left:36px; width:12px; height:12px;
+    background:var(--brass-light);
+    clip-path: polygon(50% 0%, 61% 35%, 100% 50%, 61% 65%, 50% 100%, 39% 65%, 0% 50%, 39% 35%);
+    box-shadow: 0 0 14px 3px rgba(240,198,116,.75);
+    opacity:.9;
   }
   .washi-tape.two{
-    left:auto; right:22px; top:-10px;
-    transform:rotate(8deg);
-    background:repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 7px, rgba(201,182,228,.75) 7px 14px);
+    left:auto; right:40px; top:26px; width:8px; height:8px;
+    background:#fff;
+    clip-path: polygon(50% 0%, 61% 35%, 100% 50%, 61% 65%, 50% 100%, 39% 65%, 0% 50%, 39% 35%);
+    box-shadow: 0 0 10px 2px rgba(255,255,255,.8);
   }
   .cover-top{
     display:flex; justify-content:space-between; align-items:baseline;
-    font-size:11px; letter-spacing:.06em; color:#6b4326; margin-bottom:18px; margin-top:6px;
+    font-size:11px; letter-spacing:.06em; color:var(--brass-light); margin-bottom:18px; margin-top:6px;
   }
   .bank-mark{ font-weight:700; }
   .passbook-no{ font-family: ui-monospace, Consolas, monospace; opacity:.85; }
   .refresh-btn{
     display:inline-flex; align-items:center; justify-content:center;
     width:22px; height:22px; border-radius:50%; margin-left:8px;
-    background:rgba(255,255,255,.35); border:1px solid rgba(74,44,30,.25); color:#4a2c1e;
+    background:rgba(255,255,255,.1); border:1px solid rgba(240,198,116,.4); color:#f3efff;
     font-size:12px; line-height:1; cursor:pointer; padding:0;
   }
-  .refresh-btn:hover{ background:rgba(255,255,255,.55); }
+  .refresh-btn:hover{ background:rgba(255,255,255,.2); }
   .refresh-btn:active{ transform:scale(.9); }
   .refresh-btn.spinning{ animation:spin .6s linear; }
   @keyframes spin{ to{ transform:rotate(360deg); } }
   @media (prefers-reduced-motion: reduce){ .refresh-btn.spinning{ animation:none; } }
   .title{
     margin:0 0 6px; font-size:30px; font-weight:700; letter-spacing:-.01em; text-wrap:balance;
+    text-shadow: 0 0 24px rgba(240,198,116,.35);
   }
-  .subtitle{ margin:0 0 20px; font-size:13.5px; color:#6b4326; }
+  .subtitle{ margin:0 0 20px; font-size:13.5px; color:#c9bef0; }
   .holder-row{ display:flex; }
   .holder{
     display:flex; align-items:center; gap:10px;
-    background:rgba(255,255,255,.5); border:1px dashed rgba(74,44,30,.3);
+    background:rgba(255,255,255,.06); border:1px solid rgba(240,198,116,.35);
     border-radius:14px; padding:10px 14px;
   }
   .holder-avatar{ font-size:26px; }
-  .holder-name{ font-weight:700; font-size:13px; color:#4a2c1e; }
-  .holder-sub{ font-size:11.5px; color:#6b4326; margin-top:2px; }
+  .holder-name{ font-weight:700; font-size:13px; color:#f3efff; }
+  .holder-sub{ font-size:11.5px; color:#c9bef0; margin-top:2px; }
 
   .perforation{
     height:16px;
@@ -177,7 +186,7 @@
     overflow:visible;
   }
   .gauge-fill::after{
-    content:"🧒"; position:absolute; right:-11px; top:50%; transform:translateY(-50%);
+    content:"✨"; position:absolute; right:-11px; top:50%; transform:translateY(-50%);
     font-size:18px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.25));
   }
   .gauge-labels{
@@ -186,7 +195,7 @@
   }
   .stage-stamp{
     margin-top:14px; font-size:12.5px; font-weight:700; color:var(--ink-700);
-    padding:9px 12px; border:1px dashed var(--brass); background:rgba(255,143,107,.08);
+    padding:9px 12px; border:1px dashed var(--brass); background:rgba(240,198,116,.1);
     border-radius:10px;
   }
 
@@ -197,17 +206,17 @@
     padding:22px; border-radius:18px;
     border:none;
     background:linear-gradient(180deg, var(--brass-light), var(--brass));
-    color:#4a2c1e; font-family:inherit;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), 0 10px 20px rgba(255,143,107,.35);
+    color:#1a1233; font-family:inherit;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.35), 0 10px 24px rgba(240,198,116,.4);
     transition:transform .08s ease;
   }
   .stamp-btn:active{ transform:scale(.97); }
   .stamp-btn-label{ font-size:17px; font-weight:700; letter-spacing:.01em; }
-  .stamp-btn-sub{ font-size:11.5px; color:#6b4326; font-family: ui-monospace, Consolas, monospace; }
+  .stamp-btn-sub{ font-size:11.5px; color:#4a3f73; font-family: ui-monospace, Consolas, monospace; }
   .auto-badge{
     position:absolute; top:10px; right:12px; display:none;
     font-size:10px; font-weight:700; letter-spacing:.03em;
-    background:#4a2c1e; color:#ffe3ce; padding:3px 9px; border-radius:20px;
+    background:#1a1233; color:#ffe4a3; padding:3px 9px; border-radius:20px;
   }
   .auto-badge.on{ display:inline-block; }
 
@@ -246,7 +255,7 @@
   .mkt-chart{ display:block; width:100%; height:64px; cursor:crosshair; }
   .stock-tooltip{
     position:absolute; top:-4px; left:0; transform:translate(-50%,-100%);
-    background:var(--ink-900); color:#fff3e6; font-size:11px; font-weight:600;
+    background:#0c0820; color:#fff3e6; font-size:11px; font-weight:600;
     padding:4px 8px; border-radius:6px; white-space:nowrap; pointer-events:none;
     font-family: ui-monospace, Consolas, monospace; opacity:0; transition:opacity .1s ease;
   }
@@ -269,7 +278,7 @@
   .upg-desc{ display:block; font-size:10.5px; color:var(--text-sub); margin-top:1px; }
   .upg-right{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
   .buy-btn{
-    padding:8px 12px; border:none; border-radius:10px; background:var(--ink-700); color:#fff3e6;
+    padding:8px 12px; border:none; border-radius:10px; background:var(--brass); color:#1a1233;
     font-weight:700; font-size:11.5px; cursor:pointer; white-space:nowrap; font-family: ui-monospace, Consolas, monospace;
   }
   .buy-btn:disabled{ background:transparent; color:var(--text-sub); border:1px dashed var(--paper-line); cursor:not-allowed; }
@@ -289,23 +298,24 @@
   .cover-back{ padding:18px 22px; text-align:center; background:var(--paper-shadow); border-radius:0 0 26px 26px; }
   .back-note{ margin:0; font-size:11px; color:var(--text-sub); }
 
-  /* ---- Ending modal (polaroid) ---- */
+  /* ---- Ending modal (star card) ---- */
   .modal-bg{
-    position:fixed; inset:0; background:rgba(74,44,30,.55); display:none;
+    position:fixed; inset:0; background:rgba(6,4,16,.7); display:none;
     align-items:center; justify-content:center; z-index:50; padding:20px;
   }
   .modal-bg.show{ display:flex; }
   .deed{
-    position:relative; background:#fffdf9; border:1px solid var(--paper-line);
+    position:relative; background:#1c1440; border:1px solid var(--paper-line);
     border-radius:4px; padding:44px 30px 30px; max-width:380px; text-align:center;
-    box-shadow:0 30px 70px rgba(0,0,0,.35), 0 0 0 10px #fffdf9, 0 0 0 11px var(--paper-line);
+    box-shadow:0 30px 70px rgba(0,0,0,.55), 0 0 0 10px #1c1440, 0 0 0 11px var(--paper-line), 0 0 40px rgba(240,198,116,.12);
     transform:rotate(-1.2deg);
   }
   .deed::before{
-    content:""; position:absolute; top:-14px; left:50%; transform:translateX(-50%) rotate(-4deg);
-    width:100px; height:28px;
-    background:repeating-linear-gradient(45deg, rgba(255,255,255,.55) 0 7px, rgba(255,216,153,.8) 7px 14px);
-    box-shadow:0 3px 6px rgba(0,0,0,.15); border-radius:2px;
+    content:""; position:absolute; top:-8px; left:50%; transform:translateX(-50%);
+    width:14px; height:14px;
+    background:var(--brass-light);
+    clip-path: polygon(50% 0%, 61% 35%, 100% 50%, 61% 65%, 50% 100%, 39% 65%, 0% 50%, 39% 35%);
+    box-shadow:0 0 16px 3px rgba(240,198,116,.75);
   }
   .seal{
     width:100px; height:100px; margin:0 auto 18px; border-radius:50%;
@@ -313,13 +323,13 @@
     display:flex; align-items:center; justify-content:center;
     font-size:24px; font-weight:800; letter-spacing:.03em;
     transform:rotate(-8deg);
-    background:rgba(255,143,107,.08);
+    background:rgba(240,198,116,.1);
   }
   .offline-btn{
     width:100%; padding:14px; margin-bottom:10px; border-radius:14px; border:none;
-    background:linear-gradient(135deg, var(--brass), var(--brass-light)); color:#4a2c1e;
+    background:linear-gradient(135deg, var(--brass), var(--brass-light)); color:#1a1233;
     font-weight:800; font-size:14px; cursor:pointer; font-family:inherit;
-    box-shadow:0 6px 14px rgba(255,143,107,.35);
+    box-shadow:0 6px 16px rgba(240,198,116,.4);
   }
   .offline-btn:active{ transform:scale(.98); }
   .deed h2{ margin:0 0 10px; font-size:23px; color:var(--ink-900); }
@@ -334,10 +344,10 @@
 
   .reset-wrap{ text-align:center; margin-top:20px; }
   .reset-btn{
-    background:none; border:1px dashed rgba(90,70,50,.35); color:var(--text-sub);
+    background:none; border:1px dashed rgba(157,147,194,.4); color:var(--text-sub);
     font-size:12px; padding:8px 16px; border-radius:20px; cursor:pointer; font-family:inherit;
   }
-  .reset-btn:hover{ color:var(--text-on-paper); border-color:rgba(90,70,50,.6); }
+  .reset-btn:hover{ color:var(--text-on-paper); border-color:rgba(157,147,194,.7); }
   .reset-btn:active{ transform:scale(.97); }
 
   /* ---- Toast ---- */
@@ -353,7 +363,7 @@
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
   .toast.warn{ background:linear-gradient(135deg,#ef6461,#d54e4b); }
   .toast.gain{ background:linear-gradient(135deg,#3fa980,#2c8867); }
-  .toast.move{ background:linear-gradient(135deg,var(--brass),#e06c45); }
+  .toast.move{ background:linear-gradient(135deg,var(--brass),#b8862f); color:#1a1233; }
   @media (prefers-reduced-motion: reduce){ .toast{ transition:opacity .01s linear; } }
 
   /* ---- Lotto ---- */
@@ -417,8 +427,8 @@
     <div class="washi-tape"></div>
     <div class="washi-tape two"></div>
     <div class="cover-top">
-      <span class="bank-mark">🖍️ 형식이네 육아일기 <button class="refresh-btn" id="refreshBtn" title="최신 버전 새로 불러오기" aria-label="최신 버전 새로 불러오기">⟳</button></span>
-      <span class="passbook-no mono">1권 · 2026</span>
+      <span class="bank-mark">✨ 형식이의 인생 기록부 <button class="refresh-btn" id="refreshBtn" title="최신 버전 새로 불러오기" aria-label="최신 버전 새로 불러오기">⟳</button></span>
+      <span class="passbook-no mono" id="lifeNo">1번째 생</span>
     </div>
     <h1 class="title diary-font">형식이의 모험 · 자녀양육편</h1>
     <p class="subtitle">노원 10평 → 동대문 20평 → 수지 30평 → 잠실 40평, 우리 가족 집 넓히기 성장일기</p>
@@ -620,14 +630,14 @@
     postGoal: null,
     upgrades: {
       overtime:   { name:"야근 수당",   desc:"클릭당 수입 +3,000원",      baseCost:100000,    cost:0, level:0, scale:1.18, type:"click", value:3000 },
-      autoclick:  { name:"자동 출납기", desc:"1.5초마다 자동으로 일합니다 (클릭 1회와 동일)", baseCost:1000000, cost:0, level:0, scale:1, type:"auto", value:1, maxLevel:1 },
-      delivery:   { name:"배달 부업",   desc:"자동 수입 +5,000원/초",      baseCost:600000,    cost:0, level:0, scale:1.2,  type:"cps",   value:5000 },
-      savings:    { name:"예금 이자",   desc:"자동 수입 +20,000원/초",     baseCost:2500000,   cost:0, level:0, scale:1.2,  type:"cps",   value:20000 },
+      autoclick:  { name:"자동 출납기", desc:"2.5초마다 자동으로 일합니다 (클릭 1회와 동일)", baseCost:1000000, cost:0, level:0, scale:1, type:"auto", value:1, maxLevel:1 },
+      delivery:   { name:"배달 부업",   desc:"자동 수입 +3,000원/초",      baseCost:600000,    cost:0, level:0, scale:1.2,  type:"cps",   value:3000 },
+      savings:    { name:"예금 이자",   desc:"자동 수입 +12,000원/초",     baseCost:2500000,   cost:0, level:0, scale:1.2,  type:"cps",   value:12000 },
       lecture:    { name:"재테크 강의", desc:"모든 수입 x1.3배",           baseCost:15000000,  cost:0, level:0, scale:1.8,  type:"mult",  value:0.3, maxLevel:6 },
-      promotion:  { name:"승진",       desc:"자동 수입 +200,000원/초",     baseCost:70000000,  cost:0, level:0, scale:1.19, type:"cps",   value:200000 },
-      executive:  { name:"임원 승진",   desc:"자동 수입 +500,000원/초",     baseCost:150000000, cost:0, level:0, scale:1.2,  type:"cps",   value:500000 },
-      realestate: { name:"부동산 스터디", desc:"자동 수입 +1,000,000원/초", baseCost:300000000, cost:0, level:0, scale:1.18, type:"cps",   value:1000000 },
-      landlord:   { name:"건물주",     desc:"자동 수입 +5,000,000원/초",   baseCost:1200000000,cost:0, level:0, scale:1.2,  type:"cps",   value:5000000 }
+      promotion:  { name:"승진",       desc:"자동 수입 +120,000원/초",     baseCost:70000000,  cost:0, level:0, scale:1.21, type:"cps",   value:120000 },
+      executive:  { name:"임원 승진",   desc:"자동 수입 +300,000원/초",     baseCost:150000000, cost:0, level:0, scale:1.22, type:"cps",   value:300000 },
+      realestate: { name:"부동산 스터디", desc:"자동 수입 +600,000원/초",   baseCost:300000000, cost:0, level:0, scale:1.21, type:"cps",   value:600000 },
+      landlord:   { name:"건물주",     desc:"자동 수입 +3,000,000원/초",   baseCost:1200000000,cost:0, level:0, scale:1.22, type:"cps",   value:3000000 }
     },
     autoClick:false,
     modalOpen:false,
@@ -782,6 +792,7 @@
     document.getElementById("progressText").textContent = (progress*100).toFixed(1) + "%";
     updateStageText(progress);
     updateAgeDisplay();
+    document.getElementById("lifeNo").textContent = (state.prestige.count + 1) + "번째 생";
 
     MARKET_KEYS.forEach(renderMarket);
 
@@ -1097,10 +1108,10 @@
       const x = xAt(i), y = yAt(p);
       ctx.beginPath();
       ctx.arc(x, y, 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#fffaf1";
+      ctx.fillStyle = "#fff4d6";
       ctx.fill();
       ctx.lineWidth = 2.5;
-      ctx.strokeStyle = "#ff8f6b";
+      ctx.strokeStyle = "#f0c674";
       ctx.stroke();
     });
 
@@ -1372,7 +1383,7 @@
   });
   setInterval(maybeNewsHint, 3000);
   setInterval(()=>{ if(Math.random() < 0.35) randomEvent(); }, 9000);
-  setInterval(()=>{ if(state.autoClick) doWork(); }, 1500);
+  setInterval(()=>{ if(state.autoClick) doWork(); }, 2500);
 
   let isResetting = false;
   function save(){
