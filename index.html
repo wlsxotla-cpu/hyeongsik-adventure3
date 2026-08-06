@@ -613,7 +613,7 @@
     },
     family: { kids:0 },
     modalQueue: [],
-    startedAt: Date.now(),
+    activeMs: 0,
     startAge: 32,
     prestige: { count:0 },
     stats: { totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null },
@@ -742,8 +742,30 @@
   const MAX_LIVE_AGE = 80;
   const MIN_FINAL_AGE = 40;
 
+  let visibleSince = (typeof document === "undefined" || document.visibilityState === "visible") ? Date.now() : null;
+
+  function currentActiveMs(){
+    const extra = (visibleSince != null) ? (Date.now() - visibleSince) : 0;
+    return (state.activeMs || 0) + extra;
+  }
+  function flushActiveMs(){
+    if(visibleSince != null){
+      state.activeMs = (state.activeMs || 0) + (Date.now() - visibleSince);
+      visibleSince = Date.now();
+    }
+  }
+  document.addEventListener("visibilitychange", ()=>{
+    if(document.visibilityState === "hidden"){
+      flushActiveMs();
+      visibleSince = null;
+      save();
+    } else {
+      visibleSince = Date.now();
+    }
+  });
+
   function ageDetail(){
-    const elapsedMs = Date.now() - state.startedAt;
+    const elapsedMs = currentActiveMs();
     const totalMonths = Math.floor(elapsedMs / (AGE_MS_PER_YEAR / 12));
     const rawYears = state.startAge + Math.floor(totalMonths / 12);
     if(rawYears >= MAX_LIVE_AGE) return { years: MAX_LIVE_AGE, months: 0 };
@@ -917,7 +939,8 @@
     state.currentHome = "서울 강동구 빌라 거주 · 기혼";
     state.postGoal = null;
     state.family = { kids:0 };
-    state.startedAt = Date.now();
+    state.activeMs = 0;
+    visibleSince = Date.now();
     state.modalQueue = [];
     state.modalOpen = false;
     Object.keys(state.upgrades).forEach(key=>{
@@ -1402,6 +1425,7 @@
   let isResetting = false;
   function save(){
     if(isResetting) return;
+    flushActiveMs();
     try{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }catch(e){}
   }
   function load(){
@@ -1426,14 +1450,12 @@
       state.prestige = Object.assign({count:0}, state.prestige || {});
       state.stats = Object.assign({totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null}, state.stats || {});
       state.everReachedFinal = !!state.everReachedFinal;
+      state.activeMs = state.activeMs || 0;
     }catch(e){}
   }
   setInterval(save, 5000);
   window.addEventListener("beforeunload", save);
   window.addEventListener("pagehide", save);
-  document.addEventListener("visibilitychange", ()=>{
-    if(document.visibilityState === "hidden") save();
-  });
 
 
   function hardRefresh(){
