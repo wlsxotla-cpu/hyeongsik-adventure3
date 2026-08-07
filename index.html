@@ -457,12 +457,24 @@
   </div>
 
   <div class="ledger">
+    <div class="ledger-head diary-font">🎫 복권방 · 인생 한 방</div>
+    <button class="lotto-btn" id="lottoBtn">🎟️ 로또 5장 사기 (50,000원)</button>
+    <div class="lotto-result" id="lottoResult">긁지 않은 복권...</div>
+    <div class="lotto-odds">1등 20억원 (1/200,000) · 2등 3천만원 (1/20,000) · 3등 150만원 (1/1,000) · 4등 5만원 (1/60) · 5등 5천원 (1/8) · 장당 확률, 5장 동시 추첨</div>
+  </div>
+
+  <div class="ledger">
     <div class="ledger-head diary-font">💪 오늘도 출근</div>
     <button class="stamp-btn" id="workBtn">
       <span class="auto-badge" id="autoBadge">자동 출근중</span>
       <span class="stamp-btn-label">출근해서 일하기</span>
       <span class="stamp-btn-sub mono" id="clickValueText">클릭당 +10,000원</span>
     </button>
+  </div>
+
+  <div class="ledger">
+    <div class="ledger-head diary-font">⭐ 우리집 습관 스티커</div>
+    <div id="upgradeList"></div>
   </div>
 
   <div class="ledger">
@@ -543,18 +555,6 @@
   </div>
 
   <div class="ledger">
-    <div class="ledger-head diary-font">🎫 복권방 · 인생 한 방</div>
-    <button class="lotto-btn" id="lottoBtn">🎟️ 로또 5장 사기 (50,000원)</button>
-    <div class="lotto-result" id="lottoResult">긁지 않은 복권...</div>
-    <div class="lotto-odds">1등 20억원 (1/200,000) · 2등 3천만원 (1/20,000) · 3등 150만원 (1/1,000) · 4등 5만원 (1/60) · 5등 5천원 (1/8) · 장당 확률, 5장 동시 추첨</div>
-  </div>
-
-  <div class="ledger">
-    <div class="ledger-head diary-font">⭐ 우리집 습관 스티커</div>
-    <div id="upgradeList"></div>
-  </div>
-
-  <div class="ledger">
     <div class="ledger-head diary-font">📊 나의 기록</div>
     <div class="stock-hold" id="statTotalClicks">총 클릭 수 0회</div>
     <div class="stock-hold" id="statTotalEarned">누적 수입 0원</div>
@@ -601,10 +601,11 @@
   const SAVE_KEY = "hyeongsik_adventure_childrearing_v1";
   const MARKET_HISTORY_MAX = 40;
   const AGE_MS_PER_YEAR = 100 * 1000; // 현실 100초 = 게임 속 1년. 시뮬레이션 기준 평균 완주 나이 50~60대로 재보정 (상한 없음)
+  const BASE_CLICK_VALUE = 18000; // 환생 리셋 시에도 이 상수를 참조 - 밸런스 값이 하나로만 관리되게
 
   const state = {
     money: 0,
-    clickBase: 18000,
+    clickBase: BASE_CLICK_VALUE,
     clickMult: 1,
     cps: 0,
     markets: {
@@ -948,7 +949,7 @@
     const ok = window.confirm("정말 다시 태어날까요? 현재 자산·업그레이드·투자·나이가 전부 초기화되고, 대신 영구 배율 보너스가 영원히 남습니다.");
     if(!ok) return;
     state.money = 0;
-    state.clickBase = 2000;
+    state.clickBase = BASE_CLICK_VALUE;
     state.clickMult = 1;
     state.cps = 0;
     state.autoClick = false;
