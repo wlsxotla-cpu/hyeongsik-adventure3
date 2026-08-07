@@ -1521,7 +1521,6 @@
       addMoney(rate / 5);
       if(rentRate > 0){
         state.markets.realty.totalRentEarned = (state.markets.realty.totalRentEarned || 0) + rentRate / 5;
-        state.stats.investProfitLifetime += rentRate / 5;
       }
       changed = true;
     }
