@@ -559,7 +559,7 @@
     <div class="stock-hold" id="statTotalEarned">누적 수입 0원</div>
     <div class="stock-hold" id="statInvestProfit">투자 누적 수익 0원</div>
     <div class="stock-hold" id="statMultBonus">현재 배율 보너스 +0%</div>
-    <div class="stock-hold" id="statBestFinalAge">잠실 완주 최연소 기록 없음</div>
+    <div class="stock-hold" id="statBestFinalAge">완주 최연소 기록 없음</div>
   </div>
 
   <div class="ledger">
@@ -599,11 +599,11 @@
 
   const SAVE_KEY = "hyeongsik_adventure_childrearing_v1";
   const MARKET_HISTORY_MAX = 40;
-  const AGE_MS_PER_YEAR = 40 * 1000; // 현실 40초 = 게임 속 1년. 완주 나이는 40세 이상(상한 없음) - 느리게 플레이할수록 한없이 늙어감
+  const AGE_MS_PER_YEAR = 100 * 1000; // 현실 100초 = 게임 속 1년. 시뮬레이션 기준 평균 완주 나이 50~60대로 재보정 (상한 없음)
 
   const state = {
     money: 0,
-    clickBase: 6000,
+    clickBase: 18000,
     clickMult: 1,
     cps: 0,
     markets: {
@@ -623,22 +623,22 @@
     activeMs: 0,
     startAge: 32,
     prestige: { count:0 },
-    stats: { totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null },
+    stats: { totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null, bestFinalAgeRebirths:0 },
     everReachedFinal: false,
     loan: { balance:0, capitalNotifiedForStage:null },
     stageIndex: 0,
     currentHome: "서울 강동구 빌라 거주 · 기혼",
     postGoal: null,
     upgrades: {
-      overtime:   { name:"야근 수당",   desc:"클릭당 수입 +9,000원",      baseCost:300000,    cost:0, level:0, scale:1.18, type:"click", value:9000 },
+      overtime:   { name:"야근 수당",   desc:"클릭당 수입 +27,000원",     baseCost:300000,    cost:0, level:0, scale:1.18, type:"click", value:27000 },
       autoclick:  { name:"자동 출납기", desc:"2.5초마다 자동으로 일합니다 (클릭 1회와 동일)", baseCost:3000000, cost:0, level:0, scale:1, type:"auto", value:1, maxLevel:1 },
-      delivery:   { name:"배달 부업",   desc:"자동 수입 +9,000원/초",      baseCost:1800000,   cost:0, level:0, scale:1.2,  type:"cps",   value:9000 },
-      savings:    { name:"예금 이자",   desc:"자동 수입 +36,000원/초",     baseCost:7500000,   cost:0, level:0, scale:1.2,  type:"cps",   value:36000 },
+      delivery:   { name:"배달 부업",   desc:"자동 수입 +27,000원/초",     baseCost:1800000,   cost:0, level:0, scale:1.2,  type:"cps",   value:27000 },
+      savings:    { name:"예금 이자",   desc:"자동 수입 +108,000원/초",    baseCost:7500000,   cost:0, level:0, scale:1.2,  type:"cps",   value:108000 },
       lecture:    { name:"재테크 강의", desc:"모든 수입 x1.3배",           baseCost:45000000,  cost:0, level:0, scale:1.8,  type:"mult",  value:0.3, maxLevel:6 },
-      promotion:  { name:"승진",       desc:"자동 수입 +360,000원/초",     baseCost:210000000, cost:0, level:0, scale:1.21, type:"cps",   value:360000 },
-      executive:  { name:"임원 승진",   desc:"자동 수입 +900,000원/초",     baseCost:450000000, cost:0, level:0, scale:1.22, type:"cps",   value:900000 },
-      realestate: { name:"부동산 스터디", desc:"자동 수입 +1,800,000원/초", baseCost:900000000, cost:0, level:0, scale:1.21, type:"cps",   value:1800000 },
-      landlord:   { name:"건물주",     desc:"자동 수입 +9,000,000원/초",   baseCost:3600000000,cost:0, level:0, scale:1.22, type:"cps",   value:9000000 }
+      promotion:  { name:"승진",       desc:"자동 수입 +1,080,000원/초",   baseCost:210000000, cost:0, level:0, scale:1.21, type:"cps",   value:1080000 },
+      executive:  { name:"임원 승진",   desc:"자동 수입 +2,700,000원/초",   baseCost:450000000, cost:0, level:0, scale:1.22, type:"cps",   value:2700000 },
+      realestate: { name:"부동산 스터디", desc:"자동 수입 +5,400,000원/초", baseCost:900000000, cost:0, level:0, scale:1.21, type:"cps",   value:5400000 },
+      landlord:   { name:"건물주",     desc:"자동 수입 +27,000,000원/초",  baseCost:3600000000,cost:0, level:0, scale:1.22, type:"cps",   value:27000000 }
     },
     autoClick:false,
     modalOpen:false,
@@ -924,8 +924,8 @@
     const bonusPct = Math.round((currentPrestigeMult() * currentInvestMult() - 1) * 100);
     document.getElementById("statMultBonus").textContent = "현재 배율 보너스 +" + bonusPct + "%";
     document.getElementById("statBestFinalAge").textContent = state.stats.bestFinalAge != null
-      ? `잠실 완주 최연소 기록 ${state.stats.bestFinalAge}세`
-      : "잠실 완주 최연소 기록 없음";
+      ? `완주 최연소 기록 ${state.stats.bestFinalAge}세 (${state.stats.bestFinalAgeRebirths}회 환생 후)`
+      : "완주 최연소 기록 없음";
   }
 
   function renderPrestige(){
@@ -1464,6 +1464,7 @@
         const ageNow = finalAchievementAge();
         if(state.stats.bestFinalAge == null || ageNow < state.stats.bestFinalAge){
           state.stats.bestFinalAge = ageNow;
+          state.stats.bestFinalAgeRebirths = state.prestige.count;
         }
       }
       state.currentHome = s.sub;
@@ -1559,7 +1560,7 @@
       });
       state.family = Object.assign({kids:0}, state.family || {});
       state.prestige = Object.assign({count:0}, state.prestige || {});
-      state.stats = Object.assign({totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null}, state.stats || {});
+      state.stats = Object.assign({totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null, bestFinalAgeRebirths:0}, state.stats || {});
       state.everReachedFinal = !!state.everReachedFinal;
       state.activeMs = state.activeMs || 0;
       state.loan = Object.assign({balance:0, capitalNotifiedForStage:null}, state.loan || {});
