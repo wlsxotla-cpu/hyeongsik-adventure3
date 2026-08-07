@@ -1582,6 +1582,9 @@
       state.everReachedFinal = !!state.everReachedFinal;
       state.activeMs = state.activeMs || 0;
       state.loan = Object.assign({balance:0, capitalNotifiedForStage:null}, state.loan || {});
+      // 예전 환생 버그로 clickBase가 옛 밸런스값(2000원)에 박혀버린 세이브 자동 복구.
+      // clickBase는 정상적으로는 절대 BASE_CLICK_VALUE 밑으로 내려갈 수 없음(업그레이드로만 증가).
+      if(state.clickBase < BASE_CLICK_VALUE) state.clickBase = BASE_CLICK_VALUE;
     }catch(e){}
   }
   setInterval(save, 5000);
