@@ -603,7 +603,7 @@
 
   const state = {
     money: 0,
-    clickBase: 2000,
+    clickBase: 6000,
     clickMult: 1,
     cps: 0,
     markets: {
@@ -625,20 +625,20 @@
     prestige: { count:0 },
     stats: { totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null },
     everReachedFinal: false,
-    loan: { balance:0 },
+    loan: { balance:0, capitalNotifiedForStage:null },
     stageIndex: 0,
     currentHome: "서울 강동구 빌라 거주 · 기혼",
     postGoal: null,
     upgrades: {
-      overtime:   { name:"야근 수당",   desc:"클릭당 수입 +3,000원",      baseCost:100000,    cost:0, level:0, scale:1.18, type:"click", value:3000 },
-      autoclick:  { name:"자동 출납기", desc:"2.5초마다 자동으로 일합니다 (클릭 1회와 동일)", baseCost:1000000, cost:0, level:0, scale:1, type:"auto", value:1, maxLevel:1 },
-      delivery:   { name:"배달 부업",   desc:"자동 수입 +3,000원/초",      baseCost:600000,    cost:0, level:0, scale:1.2,  type:"cps",   value:3000 },
-      savings:    { name:"예금 이자",   desc:"자동 수입 +12,000원/초",     baseCost:2500000,   cost:0, level:0, scale:1.2,  type:"cps",   value:12000 },
-      lecture:    { name:"재테크 강의", desc:"모든 수입 x1.3배",           baseCost:15000000,  cost:0, level:0, scale:1.8,  type:"mult",  value:0.3, maxLevel:6 },
-      promotion:  { name:"승진",       desc:"자동 수입 +120,000원/초",     baseCost:70000000,  cost:0, level:0, scale:1.21, type:"cps",   value:120000 },
-      executive:  { name:"임원 승진",   desc:"자동 수입 +300,000원/초",     baseCost:150000000, cost:0, level:0, scale:1.22, type:"cps",   value:300000 },
-      realestate: { name:"부동산 스터디", desc:"자동 수입 +600,000원/초",   baseCost:300000000, cost:0, level:0, scale:1.21, type:"cps",   value:600000 },
-      landlord:   { name:"건물주",     desc:"자동 수입 +3,000,000원/초",   baseCost:1200000000,cost:0, level:0, scale:1.22, type:"cps",   value:3000000 }
+      overtime:   { name:"야근 수당",   desc:"클릭당 수입 +9,000원",      baseCost:300000,    cost:0, level:0, scale:1.18, type:"click", value:9000 },
+      autoclick:  { name:"자동 출납기", desc:"2.5초마다 자동으로 일합니다 (클릭 1회와 동일)", baseCost:3000000, cost:0, level:0, scale:1, type:"auto", value:1, maxLevel:1 },
+      delivery:   { name:"배달 부업",   desc:"자동 수입 +9,000원/초",      baseCost:1800000,   cost:0, level:0, scale:1.2,  type:"cps",   value:9000 },
+      savings:    { name:"예금 이자",   desc:"자동 수입 +36,000원/초",     baseCost:7500000,   cost:0, level:0, scale:1.2,  type:"cps",   value:36000 },
+      lecture:    { name:"재테크 강의", desc:"모든 수입 x1.3배",           baseCost:45000000,  cost:0, level:0, scale:1.8,  type:"mult",  value:0.3, maxLevel:6 },
+      promotion:  { name:"승진",       desc:"자동 수입 +360,000원/초",     baseCost:210000000, cost:0, level:0, scale:1.21, type:"cps",   value:360000 },
+      executive:  { name:"임원 승진",   desc:"자동 수입 +900,000원/초",     baseCost:450000000, cost:0, level:0, scale:1.22, type:"cps",   value:900000 },
+      realestate: { name:"부동산 스터디", desc:"자동 수입 +1,800,000원/초", baseCost:900000000, cost:0, level:0, scale:1.21, type:"cps",   value:1800000 },
+      landlord:   { name:"건물주",     desc:"자동 수입 +9,000,000원/초",   baseCost:3600000000,cost:0, level:0, scale:1.22, type:"cps",   value:9000000 }
     },
     autoClick:false,
     modalOpen:false,
@@ -680,18 +680,18 @@
   }
 
   const STORY_STAGES = [
-    { home:"노원구 10평대 아파트",       goal:250000000,   sub:"서울 노원구 10평대 아파트 거주 · 기혼",
+    { home:"노원구 10평대 아파트",         goal:700000000,    sub:"서울 노원구 10평대 아파트 거주 · 기혼",
       moveMsg:"노원구 10평대 아파트로 첫 내 집 마련에 성공했다!", ltv:0.8, loanLabel:"생애최초 특례 대출" },
-    { home:"동대문구 20평대 아파트",     goal:450000000,   sub:"서울 동대문구 20평대 아파트 거주 · 기혼",
+    { home:"동대문구 20평대 아파트",       goal:1100000000,   sub:"서울 동대문구 20평대 아파트 거주 · 기혼",
       moveMsg:"동대문구 20평대 아파트로 갈아탔다!", ltv:0.4, loanLabel:"일반 주택담보대출" },
-    { home:"용인 수지구 30평대 아파트", goal:800000000,   sub:"경기 용인시 수지구 30평대 아파트 거주 · 기혼",
+    { home:"용인 수지구 30평대 아파트",   goal:1300000000,   sub:"경기 용인시 수지구 30평대 아파트 거주 · 기혼",
       moveMsg:"드디어 용인 수지구 30평대 아파트로 갈아탔다!", ltv:0.4, loanLabel:"일반 주택담보대출" },
-    { home:"잠실 40평대 아파트",         goal:1550000000,  sub:"서울 송파구 잠실 40평대 아파트 거주 · 기혼",
-      moveMsg:"잠실 40평대 아파트 입성!", ltv:0.4, loanLabel:"일반 주택담보대출" },
-    { home:"반포 래미안 50평대 아파트", goal:3200000000,  sub:"서울 서초구 반포 래미안 50평대 아파트 거주 · 기혼",
-      moveMsg:"반포 래미안 50평대로 갈아탔다! 진짜 부자 동네다.", ltv:0.4, loanLabel:"일반 주택담보대출" },
-    { home:"한남더힐 펜트하우스",        goal:8000000000,  sub:"서울 용산구 한남더힐 펜트하우스 거주 · 기혼",
-      moveMsg:"한남더힐 펜트하우스 입성! 형식이의 모험을 완주했다!", ltv:0.4, loanLabel:"일반 주택담보대출" }
+    { home:"송파구 잠실 40평대 아파트",   goal:2800000000,   sub:"서울 송파구 잠실 40평대 아파트 거주 · 기혼",
+      moveMsg:"송파구 잠실 40평대 아파트 입성!", ltv:0.4, loanLabel:"일반 주택담보대출" },
+    { home:"서초구 반포 래미안 50평대 아파트", goal:5500000000, sub:"서울 서초구 반포 래미안 50평대 아파트 거주 · 기혼",
+      moveMsg:"서초구 반포 래미안 50평대로 갈아탔다! 진짜 부자 동네다.", ltv:0.4, loanLabel:"일반 주택담보대출" },
+    { home:"용산구 한남더힐 펜트하우스", goal:12000000000,  sub:"서울 용산구 한남더힐 펜트하우스 거주 · 기혼",
+      moveMsg:"용산구 한남더힐 펜트하우스 입성! 형식이의 모험을 완주했다!", ltv:0.4, loanLabel:"일반 주택담보대출" }
   ];
 
   const LIFE_EVENTS = [
@@ -960,7 +960,7 @@
     state.modalQueue = [];
     state.modalOpen = false;
     state.everReachedFinal = false;
-    state.loan = { balance:0 };
+    state.loan = { balance:0, capitalNotifiedForStage:null };
     Object.keys(state.upgrades).forEach(key=>{
       state.upgrades[key] = Object.assign({}, defaultUpgrades[key]);
     });
@@ -989,17 +989,33 @@
       btn.style.display = "none";
       repayBtn.style.display = "block";
       repayBtn.disabled = state.money <= 0;
-    } else if(state.stageIndex >= STORY_STAGES.length){
+      return;
+    }
+    if(state.stageIndex >= STORY_STAGES.length){
       infoEl.textContent = "더 이상 대출로 갈아탈 곳이 없습니다";
       btn.style.display = "none";
       repayBtn.style.display = "none";
+      return;
+    }
+    const stage = STORY_STAGES[state.stageIndex];
+    const loanAmount = Math.floor(stage.goal * stage.ltv);
+    const downPayment = stage.goal - loanAmount;
+    const ready = state.money >= downPayment;
+    repayBtn.style.display = "none";
+    btn.style.display = "block";
+    btn.disabled = !ready;
+    if(ready){
+      btn.textContent = `🏦 ${stage.loanLabel}로 즉시 이사 (자기자본 ${fmt(downPayment)} 사용)`;
+      infoEl.textContent = `${stage.loanLabel} (LTV ${Math.round(stage.ltv*100)}%) · 대출 ${fmt(loanAmount)} + 자기자본 ${fmt(downPayment)} 준비 완료!`;
+      if(state.loan.capitalNotifiedForStage !== state.stageIndex){
+        state.loan.capitalNotifiedForStage = state.stageIndex;
+        log(`🏦 대출 가능! ${stage.home} 자기자본이 모였습니다`, "event");
+        showToast(`🏦 대출 가능! ${stage.home} 자기자본 완료`, "move");
+      }
     } else {
-      const stage = STORY_STAGES[state.stageIndex];
-      const loanAmount = Math.floor(stage.goal * stage.ltv);
-      infoEl.textContent = `${stage.loanLabel} (LTV ${Math.round(stage.ltv*100)}%) · 최대 ${fmt(loanAmount)}까지 대출 가능`;
-      btn.textContent = `🏦 대출로 즉시 이사 (${fmt(loanAmount)})`;
-      btn.style.display = "block";
-      repayBtn.style.display = "none";
+      const pct = downPayment > 0 ? Math.min(100, Math.floor(state.money / downPayment * 100)) : 100;
+      btn.textContent = `🏦 ${stage.loanLabel} (자기자본 부족)`;
+      infoEl.textContent = `${stage.loanLabel} (LTV ${Math.round(stage.ltv*100)}%) · 자기자본 ${fmt(downPayment)} 필요 · 보유 ${fmt(state.money)} (${pct}%)`;
     }
   }
 
@@ -1008,10 +1024,13 @@
     if(state.stageIndex >= STORY_STAGES.length) return;
     const stage = STORY_STAGES[state.stageIndex];
     const loanAmount = Math.floor(stage.goal * stage.ltv);
-    const ok = window.confirm(`${stage.loanLabel}로 ${fmt(loanAmount)}을 빌려 ${stage.home}(으)로 즉시 이사할까요? 대출금은 현금화되지 않고, 다 갚을 때까지 자동수입에서 이자가 계속 빠져나갑니다.`);
+    const downPayment = stage.goal - loanAmount;
+    if(state.money < downPayment) return;
+    const ok = window.confirm(`자기자본 ${fmt(downPayment)}을 내고 ${stage.loanLabel}로 ${fmt(loanAmount)}을 빌려 ${stage.home}(으)로 즉시 이사할까요? 대출금은 현금화되지 않고, 다 갚을 때까지 자동수입에서 이자가 계속 빠져나갑니다.`);
     if(!ok) return;
+    state.money -= downPayment;
     state.loan.balance = loanAmount;
-    log(`${stage.loanLabel} 실행 (LTV ${Math.round(stage.ltv*100)}%, ${fmt(loanAmount)})`, "event");
+    log(`${stage.loanLabel} 실행 (자기자본 ${fmt(downPayment)} + 대출 ${fmt(loanAmount)})`, "event");
     showToast(`🏦 대출로 ${stage.home} 즉시 이사!`, "move");
     state.modalOpen = true;
     triggerStageComplete();
@@ -1543,7 +1562,7 @@
       state.stats = Object.assign({totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null}, state.stats || {});
       state.everReachedFinal = !!state.everReachedFinal;
       state.activeMs = state.activeMs || 0;
-      state.loan = Object.assign({balance:0}, state.loan || {});
+      state.loan = Object.assign({balance:0, capitalNotifiedForStage:null}, state.loan || {});
     }catch(e){}
   }
   setInterval(save, 5000);
