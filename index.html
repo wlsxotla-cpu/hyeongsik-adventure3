@@ -592,7 +592,7 @@
 
   const SAVE_KEY = "hyeongsik_adventure_childrearing_v1";
   const MARKET_HISTORY_MAX = 40;
-  const AGE_MS_PER_YEAR = 30 * 1000; // 현실 30초 = 게임 속 1년. 40~80세로 클램프되어 평균 플레이는 50~60대, 잘하면 40대, 못하면 80대에 완주하도록 설계
+  const AGE_MS_PER_YEAR = 40 * 1000; // 현실 40초 = 게임 속 1년. 완주 나이는 40세 이상(상한 없음) - 느리게 플레이할수록 한없이 늙어감
 
   const state = {
     money: 0,
@@ -739,7 +739,6 @@
     return state.family.kids > 0 ? " · 슬하 " + state.family.kids + "명" : "";
   }
 
-  const MAX_LIVE_AGE = 80;
   const MIN_FINAL_AGE = 40;
 
   let visibleSince = (typeof document === "undefined" || document.visibilityState === "visible") ? Date.now() : null;
@@ -767,9 +766,7 @@
   function ageDetail(){
     const elapsedMs = currentActiveMs();
     const totalMonths = Math.floor(elapsedMs / (AGE_MS_PER_YEAR / 12));
-    const rawYears = state.startAge + Math.floor(totalMonths / 12);
-    if(rawYears >= MAX_LIVE_AGE) return { years: MAX_LIVE_AGE, months: 0 };
-    return { years: rawYears, months: totalMonths % 12 };
+    return { years: state.startAge + Math.floor(totalMonths / 12), months: totalMonths % 12 };
   }
   function currentAge(){
     return ageDetail().years;
