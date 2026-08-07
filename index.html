@@ -681,7 +681,7 @@
 
   const STORY_STAGES = [
     { home:"노원구 10평대 아파트",         goal:700000000,    sub:"서울 노원구 10평대 아파트 거주 · 기혼",
-      moveMsg:"노원구 10평대 아파트로 첫 내 집 마련에 성공했다!", ltv:0.8, loanLabel:"생애최초 특례 대출" },
+      moveMsg:"노원구 10평대 아파트로 첫 내 집 마련에 성공했다!", ltv:0.8, loanCap:400000000, loanLabel:"생애최초 특례 대출" },
     { home:"동대문구 20평대 아파트",       goal:1100000000,   sub:"서울 동대문구 20평대 아파트 거주 · 기혼",
       moveMsg:"동대문구 20평대 아파트로 갈아탔다!", ltv:0.4, loanLabel:"일반 주택담보대출" },
     { home:"용인 수지구 30평대 아파트",   goal:1300000000,   sub:"경기 용인시 수지구 30평대 아파트 거주 · 기혼",
@@ -979,6 +979,11 @@
 
   const LOAN_INTEREST_RATE = 0.00005; // 초당 대출잔액의 0.005%가 이자로 나감
 
+  function loanAmountForStage(stage){
+    const byLtv = Math.floor(stage.goal * stage.ltv);
+    return stage.loanCap ? Math.min(byLtv, stage.loanCap) : byLtv;
+  }
+
   function renderLoan(){
     const infoEl = document.getElementById("loanInfo");
     const btn = document.getElementById("loanBtn");
@@ -998,15 +1003,16 @@
       return;
     }
     const stage = STORY_STAGES[state.stageIndex];
-    const loanAmount = Math.floor(stage.goal * stage.ltv);
+    const loanAmount = loanAmountForStage(stage);
     const downPayment = stage.goal - loanAmount;
+    const capNote = stage.loanCap && loanAmount === stage.loanCap ? ` (한도 ${fmt(stage.loanCap)} 적용)` : "";
     const ready = state.money >= downPayment;
     repayBtn.style.display = "none";
     btn.style.display = "block";
     btn.disabled = !ready;
     if(ready){
-      btn.textContent = `🏦 ${stage.loanLabel}로 즉시 이사 (자기자본 ${fmt(downPayment)} 사용)`;
-      infoEl.textContent = `${stage.loanLabel} (LTV ${Math.round(stage.ltv*100)}%) · 대출 ${fmt(loanAmount)} + 자기자본 ${fmt(downPayment)} 준비 완료!`;
+      btn.textContent = `🏦 대출 ${fmt(loanAmount)}로 즉시 이사 (자기자본 ${fmt(downPayment)} 사용)`;
+      infoEl.textContent = `${stage.loanLabel} (LTV ${Math.round(stage.ltv*100)}%${capNote}) · 대출 ${fmt(loanAmount)} + 자기자본 ${fmt(downPayment)} 준비 완료!`;
       if(state.loan.capitalNotifiedForStage !== state.stageIndex){
         state.loan.capitalNotifiedForStage = state.stageIndex;
         log(`🏦 대출 가능! ${stage.home} 자기자본이 모였습니다`, "event");
@@ -1014,8 +1020,8 @@
       }
     } else {
       const pct = downPayment > 0 ? Math.min(100, Math.floor(state.money / downPayment * 100)) : 100;
-      btn.textContent = `🏦 ${stage.loanLabel} (자기자본 부족)`;
-      infoEl.textContent = `${stage.loanLabel} (LTV ${Math.round(stage.ltv*100)}%) · 자기자본 ${fmt(downPayment)} 필요 · 보유 ${fmt(state.money)} (${pct}%)`;
+      btn.textContent = `🏦 대출 ${fmt(loanAmount)} 가능 (자기자본 부족)`;
+      infoEl.textContent = `${stage.loanLabel} (LTV ${Math.round(stage.ltv*100)}%${capNote}) · 대출 ${fmt(loanAmount)} · 자기자본 ${fmt(downPayment)} 필요 · 보유 ${fmt(state.money)} (${pct}%)`;
     }
   }
 
@@ -1023,7 +1029,7 @@
     if(state.loan.balance > 0) return;
     if(state.stageIndex >= STORY_STAGES.length) return;
     const stage = STORY_STAGES[state.stageIndex];
-    const loanAmount = Math.floor(stage.goal * stage.ltv);
+    const loanAmount = loanAmountForStage(stage);
     const downPayment = stage.goal - loanAmount;
     if(state.money < downPayment) return;
     const ok = window.confirm(`자기자본 ${fmt(downPayment)}을 내고 ${stage.loanLabel}로 ${fmt(loanAmount)}을 빌려 ${stage.home}(으)로 즉시 이사할까요? 대출금은 현금화되지 않고, 다 갚을 때까지 자동수입에서 이자가 계속 빠져나갑니다.`);
