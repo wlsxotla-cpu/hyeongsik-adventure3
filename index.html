@@ -468,6 +468,7 @@
   <div class="ledger">
     <div class="ledger-head diary-font">🏦 대출</div>
     <div class="stock-hold" id="loanInfo">대출 없음</div>
+    <div class="stock-hold" id="loanNextInfo"></div>
     <button class="lotto-btn" id="loanBtn" style="margin-top:10px;">대출 실행</button>
     <button class="mkt-sell" id="loanRepayBtn" style="width:100%; padding:14px; border-radius:14px; margin-top:8px; display:none;">대출 상환</button>
   </div>
@@ -623,7 +624,7 @@
     activeMs: 0,
     startAge: 32,
     prestige: { count:0 },
-    stats: { totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null, bestFinalAgeRebirths:0 },
+    stats: { totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null, bestFinalAgeRebirths:0, bestFinalAgeHadLoan:false },
     everReachedFinal: false,
     loan: { balance:0, capitalNotifiedForStage:null },
     stageIndex: 0,
@@ -924,7 +925,7 @@
     const bonusPct = Math.round((currentPrestigeMult() * currentInvestMult() - 1) * 100);
     document.getElementById("statMultBonus").textContent = "현재 배율 보너스 +" + bonusPct + "%";
     document.getElementById("statBestFinalAge").textContent = state.stats.bestFinalAge != null
-      ? `완주 최연소 기록 ${state.stats.bestFinalAge}세 (${state.stats.bestFinalAgeRebirths}회 환생 후)`
+      ? `완주 최연소 기록 ${state.stats.bestFinalAge}세 (${state.stats.bestFinalAgeRebirths}회 환생 후${state.stats.bestFinalAgeHadLoan ? " · 대출 낀 상태" : " · 대출 없이 완납"})`
       : "완주 최연소 기록 없음";
   }
 
@@ -986,33 +987,37 @@
 
   function renderLoan(){
     const infoEl = document.getElementById("loanInfo");
+    const nextEl = document.getElementById("loanNextInfo");
     const btn = document.getElementById("loanBtn");
     const repayBtn = document.getElementById("loanRepayBtn");
-    if(state.loan.balance > 0){
+
+    const hasLoan = state.loan.balance > 0;
+    repayBtn.style.display = hasLoan ? "block" : "none";
+    if(hasLoan){
       const interestPerSec = state.loan.balance * LOAN_INTEREST_RATE;
       infoEl.textContent = `대출 잔액 ${fmt(state.loan.balance)} · 이자 -${fmt(interestPerSec)}/초`;
-      btn.style.display = "none";
-      repayBtn.style.display = "block";
       repayBtn.disabled = state.money <= 0;
-      return;
+    } else {
+      infoEl.textContent = "대출 없음";
     }
+
     if(state.stageIndex >= STORY_STAGES.length){
-      infoEl.textContent = "더 이상 대출로 갈아탈 곳이 없습니다";
+      nextEl.textContent = "더 이상 대출로 갈아탈 곳이 없습니다";
       btn.style.display = "none";
-      repayBtn.style.display = "none";
       return;
     }
+
     const stage = STORY_STAGES[state.stageIndex];
     const loanAmount = loanAmountForStage(stage);
     const downPayment = stage.goal - loanAmount;
     const capNote = stage.loanCap && loanAmount === stage.loanCap ? ` (한도 ${fmt(stage.loanCap)} 적용)` : "";
+    const label = hasLoan ? `${stage.loanLabel}로 대환` : stage.loanLabel;
     const ready = state.money >= downPayment;
-    repayBtn.style.display = "none";
     btn.style.display = "block";
     btn.disabled = !ready;
     if(ready){
-      btn.textContent = `🏦 대출 ${fmt(loanAmount)}로 즉시 이사 (자기자본 ${fmt(downPayment)} 사용)`;
-      infoEl.textContent = `${stage.loanLabel} (LTV ${Math.round(stage.ltv*100)}%${capNote}) · 대출 ${fmt(loanAmount)} + 자기자본 ${fmt(downPayment)} 준비 완료!`;
+      btn.textContent = `🏦 ${label} · 대출 ${fmt(loanAmount)} (자기자본 ${fmt(downPayment)} 사용)`;
+      nextEl.textContent = `${label} (LTV ${Math.round(stage.ltv*100)}%${capNote}) · 대출 ${fmt(loanAmount)} + 자기자본 ${fmt(downPayment)} 준비 완료!`;
       if(state.loan.capitalNotifiedForStage !== state.stageIndex){
         state.loan.capitalNotifiedForStage = state.stageIndex;
         log(`🏦 대출 가능! ${stage.home} 자기자본이 모였습니다`, "event");
@@ -1020,23 +1025,29 @@
       }
     } else {
       const pct = downPayment > 0 ? Math.min(100, Math.floor(state.money / downPayment * 100)) : 100;
-      btn.textContent = `🏦 대출 ${fmt(loanAmount)} 가능 (자기자본 부족)`;
-      infoEl.textContent = `${stage.loanLabel} (LTV ${Math.round(stage.ltv*100)}%${capNote}) · 대출 ${fmt(loanAmount)} · 자기자본 ${fmt(downPayment)} 필요 · 보유 ${fmt(state.money)} (${pct}%)`;
+      btn.textContent = `🏦 ${label} · 대출 ${fmt(loanAmount)} 가능 (자기자본 부족)`;
+      nextEl.textContent = `${label} (LTV ${Math.round(stage.ltv*100)}%${capNote}) · 대출 ${fmt(loanAmount)} · 자기자본 ${fmt(downPayment)} 필요 · 보유 ${fmt(state.money)} (${pct}%)`;
     }
   }
 
   function takeLoan(){
-    if(state.loan.balance > 0) return;
     if(state.stageIndex >= STORY_STAGES.length) return;
     const stage = STORY_STAGES[state.stageIndex];
     const loanAmount = loanAmountForStage(stage);
     const downPayment = stage.goal - loanAmount;
     if(state.money < downPayment) return;
-    const ok = window.confirm(`자기자본 ${fmt(downPayment)}을 내고 ${stage.loanLabel}로 ${fmt(loanAmount)}을 빌려 ${stage.home}(으)로 즉시 이사할까요? 대출금은 현금화되지 않고, 다 갚을 때까지 자동수입에서 이자가 계속 빠져나갑니다.`);
+    const isRefinance = state.loan.balance > 0;
+    const oldBalance = state.loan.balance;
+    const msg = isRefinance
+      ? `기존 대출 잔액 ${fmt(oldBalance)}을 ${stage.loanLabel}(${fmt(loanAmount)})로 대환하고, 자기자본 ${fmt(downPayment)}을 내서 ${stage.home}(으)로 즉시 이사할까요? 새 대출 잔액 기준으로 이자가 계속 빠져나갑니다.`
+      : `자기자본 ${fmt(downPayment)}을 내고 ${stage.loanLabel}로 ${fmt(loanAmount)}을 빌려 ${stage.home}(으)로 즉시 이사할까요? 대출금은 현금화되지 않고, 다 갚을 때까지 자동수입에서 이자가 계속 빠져나갑니다.`;
+    const ok = window.confirm(msg);
     if(!ok) return;
     state.money -= downPayment;
     state.loan.balance = loanAmount;
-    log(`${stage.loanLabel} 실행 (자기자본 ${fmt(downPayment)} + 대출 ${fmt(loanAmount)})`, "event");
+    log(isRefinance
+      ? `${stage.loanLabel}로 대환 (기존 ${fmt(oldBalance)} → 신규 ${fmt(loanAmount)}, 자기자본 ${fmt(downPayment)})`
+      : `${stage.loanLabel} 실행 (자기자본 ${fmt(downPayment)} + 대출 ${fmt(loanAmount)})`, "event");
     showToast(`🏦 대출로 ${stage.home} 즉시 이사!`, "move");
     state.modalOpen = true;
     triggerStageComplete();
@@ -1471,6 +1482,7 @@
         if(state.stats.bestFinalAge == null || ageNow < state.stats.bestFinalAge){
           state.stats.bestFinalAge = ageNow;
           state.stats.bestFinalAgeRebirths = state.prestige.count;
+          state.stats.bestFinalAgeHadLoan = state.loan.balance > 0;
         }
       }
       state.currentHome = s.sub;
@@ -1565,7 +1577,7 @@
       });
       state.family = Object.assign({kids:0}, state.family || {});
       state.prestige = Object.assign({count:0}, state.prestige || {});
-      state.stats = Object.assign({totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null, bestFinalAgeRebirths:0}, state.stats || {});
+      state.stats = Object.assign({totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null, bestFinalAgeRebirths:0, bestFinalAgeHadLoan:false}, state.stats || {});
       state.everReachedFinal = !!state.everReachedFinal;
       state.activeMs = state.activeMs || 0;
       state.loan = Object.assign({balance:0, capitalNotifiedForStage:null}, state.loan || {});
