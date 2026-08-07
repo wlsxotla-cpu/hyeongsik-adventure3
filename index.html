@@ -424,7 +424,7 @@
       <span class="passbook-no mono" id="lifeNo">1번째 생</span>
     </div>
     <h1 class="title diary-font">형식이의 모험 · 프레스티지</h1>
-    <p class="subtitle">노원 10평 → 동대문 20평 → 수지 30평 → 잠실 40평, 환생을 거듭하며 이어가는 내집마련 대장정</p>
+    <p class="subtitle">노원 → 동대문 → 수지 → 잠실 → 반포 → 한남더힐, 환생을 거듭하며 이어가는 내집마련 대장정</p>
     <div class="holder-row">
       <div class="holder">
         <span class="holder-avatar">🧑‍💼</span>
@@ -463,6 +463,13 @@
       <span class="stamp-btn-label">출근해서 일하기</span>
       <span class="stamp-btn-sub mono" id="clickValueText">클릭당 +10,000원</span>
     </button>
+  </div>
+
+  <div class="ledger">
+    <div class="ledger-head diary-font">🏦 대출</div>
+    <div class="stock-hold" id="loanInfo">대출 없음</div>
+    <button class="lotto-btn" id="loanBtn" style="margin-top:10px;">대출 실행</button>
+    <button class="mkt-sell" id="loanRepayBtn" style="width:100%; padding:14px; border-radius:14px; margin-top:8px; display:none;">대출 상환</button>
   </div>
 
   <div class="ledger">
@@ -559,7 +566,7 @@
     <div class="ledger-head diary-font">🌅 인생 리셋</div>
     <div class="stock-hold" id="prestigeInfo">환생 0회 · 영구 배율 +0%</div>
     <button class="lotto-btn" id="rebirthBtn" style="margin-top:10px;">🌅 다시 태어나기</button>
-    <div class="lotto-odds" id="prestigeHint">잠실 40평에 도달하면 해금됩니다.</div>
+    <div class="lotto-odds" id="prestigeHint">한남더힐 펜트하우스에 도달하면 해금됩니다.</div>
   </div>
 
   <div class="ledger">
@@ -602,14 +609,14 @@
     markets: {
       hsElec: { name:"형식전자", price:10000, minPrice:1000, unit:"주",
                 shares:0, avgPrice:0, dir:1, history:[], historyFlags:[],
-                drift:0.004, vol:0.05, tickMs:2000, limitCooldownUntil:0, hint:null, newsText:"", calm:false },
+                drift:0, vol:0.05, tickMs:2000, limitCooldownUntil:0, tradeFrozenUntil:0, hint:null, newsText:"", calm:false },
       gold:   { name:"돌반지 금", price:450000, minPrice:100000, unit:"돈",
                 shares:0, avgPrice:0, dir:1, history:[], historyFlags:[],
-                drift:0.0015, vol:0.015, tickMs:5000, limitCooldownUntil:0, hint:null, newsText:"", calm:true },
+                drift:0.0015, vol:0.015, tickMs:5000, limitCooldownUntil:0, tradeFrozenUntil:0, hint:null, newsText:"", calm:true },
       realty: { name:"힐스테이트 오피스텔", price:50000000, minPrice:5000000, unit:"채",
                 shares:0, avgPrice:0, dir:1, history:[], historyFlags:[],
-                drift:0.0025, vol:0.008, tickMs:4000, limitCooldownUntil:0, hint:null, newsText:"", calm:true,
-                rentYieldPerSec:0.00008, totalRentEarned:0 }
+                drift:0.0025, vol:0.008, tickMs:4000, limitCooldownUntil:0, tradeFrozenUntil:0, hint:null, newsText:"", calm:true,
+                rentYieldPerSec:0.0004, totalRentEarned:0 }
     },
     family: { kids:0 },
     modalQueue: [],
@@ -618,6 +625,7 @@
     prestige: { count:0 },
     stats: { totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null },
     everReachedFinal: false,
+    loan: { balance:0 },
     stageIndex: 0,
     currentHome: "서울 강동구 빌라 거주 · 기혼",
     postGoal: null,
@@ -673,13 +681,17 @@
 
   const STORY_STAGES = [
     { home:"노원구 10평대 아파트",       goal:250000000,   sub:"서울 노원구 10평대 아파트 거주 · 기혼",
-      moveMsg:"노원구 10평대 아파트로 첫 내 집 마련에 성공했다!" },
+      moveMsg:"노원구 10평대 아파트로 첫 내 집 마련에 성공했다!", ltv:0.8, loanLabel:"생애최초 특례 대출" },
     { home:"동대문구 20평대 아파트",     goal:450000000,   sub:"서울 동대문구 20평대 아파트 거주 · 기혼",
-      moveMsg:"동대문구 20평대 아파트로 갈아탔다!" },
+      moveMsg:"동대문구 20평대 아파트로 갈아탔다!", ltv:0.4, loanLabel:"일반 주택담보대출" },
     { home:"용인 수지구 30평대 아파트", goal:800000000,   sub:"경기 용인시 수지구 30평대 아파트 거주 · 기혼",
-      moveMsg:"드디어 용인 수지구 30평대 아파트로 갈아탔다!" },
+      moveMsg:"드디어 용인 수지구 30평대 아파트로 갈아탔다!", ltv:0.4, loanLabel:"일반 주택담보대출" },
     { home:"잠실 40평대 아파트",         goal:1550000000,  sub:"서울 송파구 잠실 40평대 아파트 거주 · 기혼",
-      moveMsg:"잠실 40평대 아파트 입성! 형식이의 모험을 완주했다!" }
+      moveMsg:"잠실 40평대 아파트 입성!", ltv:0.4, loanLabel:"일반 주택담보대출" },
+    { home:"반포 래미안 50평대 아파트", goal:3200000000,  sub:"서울 서초구 반포 래미안 50평대 아파트 거주 · 기혼",
+      moveMsg:"반포 래미안 50평대로 갈아탔다! 진짜 부자 동네다.", ltv:0.4, loanLabel:"일반 주택담보대출" },
+    { home:"한남더힐 펜트하우스",        goal:8000000000,  sub:"서울 용산구 한남더힐 펜트하우스 거주 · 기혼",
+      moveMsg:"한남더힐 펜트하우스 입성! 형식이의 모험을 완주했다!", ltv:0.4, loanLabel:"일반 주택담보대출" }
   ];
 
   const LIFE_EVENTS = [
@@ -833,6 +845,7 @@
     updateLottoButton();
     renderStats();
     renderPrestige();
+    renderLoan();
 
     if(!state.modalOpen && state.money >= goal){
       state.modalOpen = true;
@@ -861,14 +874,20 @@
       plEl.className = "stock-pl mono";
     }
 
-    document.getElementById(key + "BuyAll").disabled = state.money < m.price;
-    document.getElementById(key + "Sell").disabled = m.shares <= 0;
+    const frozenMsLeft = (m.tradeFrozenUntil || 0) - Date.now();
+    const frozen = frozenMsLeft > 0;
+    document.getElementById(key + "BuyAll").disabled = frozen || state.money < m.price;
+    document.getElementById(key + "Sell").disabled = frozen || m.shares <= 0;
     const buyHalfEl = document.getElementById(key + "BuyHalf");
-    if(buyHalfEl) buyHalfEl.disabled = Math.floor((state.money * 0.5) / m.price) <= 0;
+    if(buyHalfEl) buyHalfEl.disabled = frozen || Math.floor((state.money * 0.5) / m.price) <= 0;
     const sellHalfEl = document.getElementById(key + "SellHalf");
-    if(sellHalfEl) sellHalfEl.disabled = Math.floor(m.shares * 0.5) <= 0;
+    if(sellHalfEl) sellHalfEl.disabled = frozen || Math.floor(m.shares * 0.5) <= 0;
     const newsEl = document.getElementById(key + "News");
-    if(newsEl) newsEl.textContent = m.newsText || "";
+    if(newsEl){
+      newsEl.textContent = frozen
+        ? `🚨 사이드카 발동 중 · ${Math.ceil(frozenMsLeft/1000)}초 후 거래 재개`
+        : (m.newsText || "");
+    }
   }
 
   function renderUpgrades(){
@@ -919,7 +938,7 @@
       hint.textContent = "현재 진행(자산·업그레이드·투자·나이)은 초기화되지만 영구 배율은 계속 남습니다.";
     } else {
       btn.disabled = true;
-      hint.textContent = "잠실 40평에 도달하면 해금됩니다.";
+      hint.textContent = "한남더힐 펜트하우스에 도달하면 해금됩니다.";
     }
   }
 
@@ -940,6 +959,8 @@
     visibleSince = Date.now();
     state.modalQueue = [];
     state.modalOpen = false;
+    state.everReachedFinal = false;
+    state.loan = { balance:0 };
     Object.keys(state.upgrades).forEach(key=>{
       state.upgrades[key] = Object.assign({}, defaultUpgrades[key]);
     });
@@ -955,6 +976,60 @@
     MARKET_KEYS.forEach(key=> drawMarketChart(key));
   }
   document.getElementById("rebirthBtn").addEventListener("click", doRebirth);
+
+  const LOAN_INTEREST_RATE = 0.00005; // 초당 대출잔액의 0.005%가 이자로 나감
+
+  function renderLoan(){
+    const infoEl = document.getElementById("loanInfo");
+    const btn = document.getElementById("loanBtn");
+    const repayBtn = document.getElementById("loanRepayBtn");
+    if(state.loan.balance > 0){
+      const interestPerSec = state.loan.balance * LOAN_INTEREST_RATE;
+      infoEl.textContent = `대출 잔액 ${fmt(state.loan.balance)} · 이자 -${fmt(interestPerSec)}/초`;
+      btn.style.display = "none";
+      repayBtn.style.display = "block";
+      repayBtn.disabled = state.money <= 0;
+    } else if(state.stageIndex >= STORY_STAGES.length){
+      infoEl.textContent = "더 이상 대출로 갈아탈 곳이 없습니다";
+      btn.style.display = "none";
+      repayBtn.style.display = "none";
+    } else {
+      const stage = STORY_STAGES[state.stageIndex];
+      const loanAmount = Math.floor(stage.goal * stage.ltv);
+      infoEl.textContent = `${stage.loanLabel} (LTV ${Math.round(stage.ltv*100)}%) · 최대 ${fmt(loanAmount)}까지 대출 가능`;
+      btn.textContent = `🏦 대출로 즉시 이사 (${fmt(loanAmount)})`;
+      btn.style.display = "block";
+      repayBtn.style.display = "none";
+    }
+  }
+
+  function takeLoan(){
+    if(state.loan.balance > 0) return;
+    if(state.stageIndex >= STORY_STAGES.length) return;
+    const stage = STORY_STAGES[state.stageIndex];
+    const loanAmount = Math.floor(stage.goal * stage.ltv);
+    const ok = window.confirm(`${stage.loanLabel}로 ${fmt(loanAmount)}을 빌려 ${stage.home}(으)로 즉시 이사할까요? 대출금은 현금화되지 않고, 다 갚을 때까지 자동수입에서 이자가 계속 빠져나갑니다.`);
+    if(!ok) return;
+    state.loan.balance = loanAmount;
+    log(`${stage.loanLabel} 실행 (LTV ${Math.round(stage.ltv*100)}%, ${fmt(loanAmount)})`, "event");
+    showToast(`🏦 대출로 ${stage.home} 즉시 이사!`, "move");
+    state.modalOpen = true;
+    triggerStageComplete();
+    render();
+  }
+  document.getElementById("loanBtn").addEventListener("click", takeLoan);
+
+  function repayLoan(){
+    if(state.loan.balance <= 0) return;
+    const pay = Math.min(state.money, state.loan.balance);
+    if(pay <= 0) return;
+    state.money -= pay;
+    state.loan.balance -= pay;
+    log(`대출 ${fmt(pay)} 상환 (잔액 ${fmt(state.loan.balance)})`, state.loan.balance <= 0 ? "gain" : "event");
+    if(state.loan.balance <= 0) showToast("🏦 대출을 모두 상환했습니다!", "gain");
+    render();
+  }
+  document.getElementById("loanRepayBtn").addEventListener("click", repayLoan);
 
   function buyUpgrade(key){
     const u = state.upgrades[key];
@@ -1019,21 +1094,31 @@
     pushMarketHistory(m, m.price, false);
   }
 
+  const SIDECAR_FREEZE_MS = 8000;
+
   function maybeLimitEvent(key){
     const m = state.markets[key];
     if(m.calm) return false;
     if(Date.now() < m.limitCooldownUntil) return false;
     if(Math.random() >= 0.05) return false;
     m.limitCooldownUntil = Date.now() + 25000;
-    const up = Math.random() < 0.6;
+    const up = Math.random() < 0.5;
     const pct = 0.29 + Math.random()*0.02;
     m.dir = up ? 1 : -1;
     m.price = Math.max(m.minPrice, Math.round(m.price * (up ? 1 + pct : 1 - pct)));
     pushMarketHistory(m, m.price, true);
+    m.tradeFrozenUntil = Date.now() + SIDECAR_FREEZE_MS;
     const label = up ? "상한가" : "하한가";
-    const msg = (up ? "🔴 " : "🔵 ") + m.name + " " + label + "!";
+    const msg = (up ? "🔴 " : "🔵 ") + m.name + " " + label + "! (사이드카 발동, 8초간 거래 정지)";
     log(msg + ` (${fmt(m.price)})`, up ? "gain" : "loss");
     showToast(msg, up ? "gain" : "warn");
+    if(key === "hsElec" && !up){
+      const g = state.markets.gold;
+      g.price = Math.round(g.price * 1.03);
+      g.dir = 1;
+      pushMarketHistory(g, g.price, true);
+      log("🥇 주식 폭락에 안전자산 선호 심리로 돌반지 금 가격이 함께 뛰었다", "gain");
+    }
     return true;
   }
 
@@ -1289,6 +1374,7 @@
   }
   document.getElementById("lottoBtn").addEventListener("click", drawLotto);
   setInterval(updateLottoButton, 150);
+  setInterval(()=> MARKET_KEYS.forEach(renderMarket), 500);
   setInterval(updateAgeDisplay, 1000);
 
   const events = [
@@ -1300,7 +1386,9 @@
     { text:"뜻밖의 보너스를 받았다", type:"gain", toast:true, amountFn: s => Math.max(150000, s.money*0.035) },
     { text:"⚠️ 부모님이 편찮으셔서 병원비를 보냈다", type:"loss", toast:true, amountFn: s => Math.max(200000, s.money*0.05) },
     { text:"⚠️ 형식이가 몸살로 병원비를 지출했다", type:"loss", toast:true, amountFn: s => Math.max(100000, s.money*0.03) },
-    { text:"⚠️ 교통사고를 당해 치료비가 나갔다", type:"loss", toast:true, amountFn: s => Math.max(300000, s.money*0.06) }
+    { text:"⚠️ 교통사고를 당해 치료비가 나갔다", type:"loss", toast:true, amountFn: s => Math.max(300000, s.money*0.06) },
+    { text:"💸 형식이가 대출까지 받아 형식전자에 몰빵했다가 상한가를 맞았다", type:"gain", toast:true, amountFn: s => Math.max(300000, s.money*0.08) },
+    { text:"💸 형식이가 대출까지 받아 형식전자에 몰빵했다가 하한가를 맞았다", type:"loss", toast:true, amountFn: s => Math.max(300000, s.money*0.08) }
   ];
   const familyEvents = [
     { text:"아이 어린이집 특별활동비를 냈다", type:"loss", amountFn: s => Math.max(30000, s.money*0.012) },
@@ -1369,7 +1457,7 @@
           ? `형식이는 마침내 <b>${s.home}</b>의 주인이 되었습니다.`
           : `이제 <b>${s.home}</b>에 삽니다.`,
         desc2: isFinal
-          ? `강동구 빌라에서 시작해 노원, 동대문, 수지를 거쳐 잠실까지 — 형식이의 내 집 마련 대장정이 여기서 마무리됩니다. 형식이는 <b>만 ${finalAchievementAge()}세</b>에 잠실 40평대 아파트의 주인이 되었습니다. 축하합니다.`
+          ? `강동구 빌라에서 시작해 노원, 동대문, 수지, 잠실, 반포를 거쳐 한남더힐까지 — 형식이의 내 집 마련 대장정이 여기서 마무리됩니다. 형식이는 <b>만 ${finalAchievementAge()}세</b>에 <b>${s.home}</b>의 주인이 되었습니다. 축하합니다.`
           : "다음 목표를 향해 계속 나아가볼까요?",
         btnText: isFinal ? "계속 플레이하기 (더 큰 집으로)" : "계속하기"
       });
@@ -1402,14 +1490,21 @@
   setInterval(()=>{
     const rentRate = realtyRentRate();
     const rate = currentCps() + rentRate;
+    let changed = false;
     if(rate > 0){
       addMoney(rate / 5);
       if(rentRate > 0){
         state.markets.realty.totalRentEarned = (state.markets.realty.totalRentEarned || 0) + rentRate / 5;
         state.stats.investProfitLifetime += rentRate / 5;
       }
-      render();
+      changed = true;
     }
+    if(state.loan.balance > 0){
+      const interest = state.loan.balance * LOAN_INTEREST_RATE / 5;
+      state.money = Math.max(0, state.money - interest);
+      changed = true;
+    }
+    if(changed) render();
   }, 200);
 
   MARKET_KEYS.forEach(key=>{
@@ -1448,6 +1543,7 @@
       state.stats = Object.assign({totalClicks:0, totalEarnedLifetime:0, investProfitLifetime:0, bestFinalAge:null}, state.stats || {});
       state.everReachedFinal = !!state.everReachedFinal;
       state.activeMs = state.activeMs || 0;
+      state.loan = Object.assign({balance:0}, state.loan || {});
     }catch(e){}
   }
   setInterval(save, 5000);
